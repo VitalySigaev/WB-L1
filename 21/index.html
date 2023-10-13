@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="stackSize"></div>
+    <script>
+        // Вычислить размер коллстэка в основных браузерах: Chrome, Firefox, Opera и Safari (если есть возможность).
+
+        let depth = 0;  //Для отслеживания глубины стека.
+
+        function recursiveFunction() {
+            depth++;  // Увеличиваем значение переменной depth при каждом вызове функции.
+            recursiveFunction();  // Рекурсивно вызываем функцию снова, увеличивая глубину стека.
+        }
+
+        try {
+            recursiveFunction();  // Запускаем рекурсивную функцию, что приведет к переполнению стека.
+        } catch (error) {
+            document.getElementById('stackSize').innerText = `Глубина стека вызовов: ${depth}`;  // Если стек переполнен, перехватываем исключение и выводим глубину стека в элемент "stackSize".
+        }
+        // Для Chrome - 13918, для Opera GX - 13915
+        </script>
+</body >
+
+</html >

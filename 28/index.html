@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // Задача: Создать и добавить элемент с использованием шаблонов: Напишите функцию, которая создает новый элемент с использованием шаблонов (например, с помощью тега <template>) и добавляет его в DOM.
+            
+        function createAndAddElement() {
+            // Создаем шаблонный элемент
+            const template = document.createElement('template');
+
+            // Устанавливаем содержимое шаблона (HTML-разметку)
+            template.innerHTML = `
+        <div class="new-element">
+            <h2>Новый элемент</h2>
+            <p>Это новый элемент, созданный с использованием шаблона.</p>
+        </div>
+    `;
+
+            // Извлекаем элемент из шаблона
+            const newElement = template.content.firstElementChild;
+
+            // Добавляем новый элемент в DOM (например, в конец body)
+            document.body.appendChild(newElement);
+        }
+
+        // Вызываем функцию для создания и добавления элемента
+        createAndAddElement();
+
+    </script>
+</body>
+
+</html>

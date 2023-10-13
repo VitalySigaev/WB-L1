@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>1</div>
+    <h3>2</h3>
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi, quis ipsum quos, reprehenderit atque minus
+        accusamus quidem velit perferendis amet beatae sint quas sequi, magni recusandae autem fugit nobis? Nesciunt.
+    </p>
+    <script>
+        // Задача: Рекурсивный обход дерева DOM:: Напишите функцию, которая рекурсивно обходит дерево DOM, начиная с указанного элемента, и выполняет определенное действие с каждым узлом (например, выводить информацию о теге в консоль).
+        
+        function recursiveDOM(node) {
+            // Проверяем, является ли узел элементом (узел-элементом)
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                // Выводим информацию о теге в консоль
+                console.log(`Тег: ${node.tagName}`);
+
+                // Рекурсивно вызываем функцию для обхода дочерних узлов
+                for (let i = 0; i < node.childNodes.length; i++) {
+                    recursiveDOM(node.childNodes[i]);
+                }
+            }
+        }
+
+        // Начнем обход с указанного элемента (например, document.body)
+        const startElement = document.body;
+        recursiveDOM(startElement);
+
+    </script>
+</body>
+
+</html>

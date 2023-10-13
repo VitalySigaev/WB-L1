@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .box {
+        width: 100px;
+        height: 100px;
+        background-color: blue;
+        transition: all 1s ease;
+    }
+</style>
+
+<body>
+    <div class="box" id="animatedBox"></div>
+    <button id="animateButton">Запустить анимацию</button>
+    <script>
+        // Задача: Добавить анимацию для элемента: Напишите функцию, которая добавляет анимацию для элемента на веб-странице, например, плавное изменение его положения или размера.
+        
+        // Получаем элементы
+        const animatedBox = document.getElementById('animatedBox');
+        const animateButton = document.getElementById('animateButton');
+
+        animateButton.addEventListener('click', () => {
+            // Изменяем размер элемента
+            animatedBox.style.width = '200px';
+            animatedBox.style.height = '200px';
+            // Добавляем анимацию
+            animatedBox.style.transition = 'all 1s ease';
+        });
+    </script>
+
+</body>
+
+</html>

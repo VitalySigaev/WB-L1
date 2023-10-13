@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Таблица данных</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            cursor: pointer;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            list-style-type: none;
+        }
+
+        .page-item {
+            margin: 5px;
+        }
+
+        .active {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Таблица данных</h1>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Имя</th>
+                <th onclick="sortTable(1)">Фамилия</th>
+                <th onclick="sortTable(2)">Телефон</th>
+                <th onclick="sortTable(3)">Адрес</th>
+                <th onclick="sortTable(4)">Город</th>
+                <th onclick="sortTable(5)">Штат</th>
+                <th onclick="sortTable(6)">ZIP</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+        </tbody>
+    </table>
+    <ul class="pagination" id="pagination"></ul>
+    <script>
+        // Разработайте страницу, отображающую таблицу с данными. Данные необходимо подгружать из этого источника.
+        // Требования:
+        // данные должны загружаться при загрузке страницы
+        // необходимо реализовать сортировку по убыванию и по возрастания для всех колонок
+        // необходимо реализовать клиентскую пагинацию (50 элементов на странице)
+
+        let data = []; // Создаем пустой массив для хранения данных.
+        let sortOrder = 'asc'; // Переменная для хранения текущего порядка сортировки, по умолчанию по возрастанию.
+        let currentPage = 1; // Переменная для хранения текущей страницы, по умолчанию первая.
+
+        // Асинхронная функция для загрузки данных при загрузке страницы.
+        async function fetchData() {
+            const response = await fetch('http://www.filltext.com/?rows=1000&fname=%7BfirstName%7D&lname=%7BlastName%7D&tel=%7Bphone%7Cformat%7D&address=%7BstreetAddress%7D&city=%7Bcity%7D&state=%7BusState%7Cabbr%7D&zip=%7Bzip%7D&pretty=true');
+            // Отправляем GET-запрос по указанному URL для получения данных с сервера и ждем ответ.
+            const jsonData = await response.json(); // Преобразуем ответ в JSON формат.
+            data = jsonData; // Сохраняем полученные данные в переменной data.
+            renderTable(data.slice(0, 50)); // Отображаем первые 50 элементов данных в таблице.
+            renderPagination(data); // Отображаем пагинацию.
+        }
+
+        // Функция для отображения данных в таблице.
+        function renderTable(data) {
+            const tableBody = document.getElementById('table-body'); // Получаем элемент таблицы, где будут отображаться данные.
+            tableBody.innerHTML = ''; // Очищаем содержимое тела таблицы.
+
+            const startIndex = (currentPage - 1) * 50; // Вычисляем начальный индекс элемента для текущей страницы.
+            const endIndex = startIndex + 50; // Вычисляем конечный индекс элемента для текущей страницы (не более 50 элементов).
+            const pageData = data.slice(startIndex, endIndex); // Создаем массив данных для текущей страницы.
+
+            pageData.forEach(row => {
+                const tr = document.createElement('tr'); // Создаем новую строку таблицы.
+                tr.innerHTML = `<td>${row.fname}</td><td>${row.lname}</td><td>${row.tel}</td><td>${row.address}</td><td>${row.city}</td><td>${row.state}</td><td>${row.zip}</td>`;
+                // Заполняем строку данными из объекта row.
+                tableBody.appendChild(tr); // Добавляем строку в тело таблицы.
+            });
+        }
+
+        // Функция для отображения пагинации.
+        function renderPagination(data) {
+            const pagination = document.getElementById('pagination'); // Получаем элемент для отображения пагинации.
+            pagination.innerHTML = ''; // Очищаем содержимое пагинации.
+
+            const itemsPerPage = 50; // Определяем количество элементов на странице.
+            const pageCount = Math.ceil(data.length / itemsPerPage); // Вычисляем общее количество страниц данных.
+
+            for (let i = 1; i <= pageCount; i++) {
+                const li = document.createElement('li'); // Создаем новый элемент списка.
+                li.classList.add('page-item'); // Добавляем класс "page-item" к элементу списка.
+                if (i === currentPage) {
+                    li.classList.add('active'); // Если страница активная, добавляем класс "active" для выделения.
+                }
+                li.innerHTML = `<a href="#" onclick="paginate(${i})">${i}</a>`; // Устанавливаем содержимое элемента списка с номером страницы и ссылкой для переключения.
+                pagination.appendChild(li); // Добавляем элемент пагинации в контейнер пагинации.
+            }
+        }
+
+        // Функция для переключения страницы.
+        function paginate(page) {
+            currentPage = page; // Обновляем значение текущей страницы.
+            renderTable(data); // Перерисовываем таблицу для новой страницы.
+            renderPagination(data); // Перерисовываем пагинацию.
+        }
+
+        // Функция для сортировки таблицы.
+        function sortTable(columnIndex) {
+            const th = document.getElementsByTagName('th')[columnIndex]; // Получаем заголовок столбца, который был нажат.
+            const currentSort = th.getAttribute('data-sort'); // Получаем текущий порядок сортировки из атрибута "data-sort" заголовка.
+
+            if (currentSort === 'asc') {
+                data.sort((a, b) => {
+                    const keyA = a[Object.keys(a)[columnIndex]]; // Получаем значение для сравнения в текущей колонке.
+                    const keyB = b[Object.keys(b)[columnIndex]]; // Получаем значение для сравнения в текущей колонке.
+                    return keyA < keyB ? -1 : 1; // Сравниваем значения и меняем порядок сортировки на убывание.
+                });
+                th.setAttribute('data-sort', 'desc'); // Обновляем атрибут "data-sort" в заголовке для обозначения убывающей сортировки.
+            } else {
+                data.sort((a, b) => {
+                    const keyA = a[Object.keys(a)[columnIndex]]; // Получаем значение для сравнения в текущей колонке.
+                    const keyB = b[Object.keys(b)[columnIndex]]; // Получаем значение для сравнения в текущей колонке.
+                    return keyA < keyB ? 1 : -1; // Сравниваем значения и меняем порядок сортировки на возрастание.
+                });
+                th.setAttribute('data-sort', 'asc'); // Обновляем атрибут "data-sort" в заголовке для обозначения возрастающей сортировки.
+            }
+
+            renderTable(data); // Перерисовываем таблицу после сортировки.
+            renderPagination(data); // Перерисовываем пагинацию.
+        }
+
+        // Загрузка данных при загрузке страницы.
+        window.onload = fetchData;
+
+    </script>
+</body>
+
+</html>

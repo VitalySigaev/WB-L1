@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // Задача: Создать и добавить стиль для элемента: Напишите функцию, которая создает новый элемент, добавляет его в DOM и устанавливает для него стиль с помощью CSS.
+        
+        function createAndStyleElement() {
+            // Создаем новый элемент (например, <div>)
+            const newElement = document.createElement('div');
+
+            // Устанавливаем стили для элемента
+            newElement.style.width = '500px';
+            newElement.style.height = '100px';
+            newElement.style.backgroundColor = 'blue';
+            newElement.style.color = 'white';
+            newElement.style.textAlign = 'center';
+            newElement.style.lineHeight = '100px';
+
+            // Устанавливаем текстовое содержимое элемента
+            newElement.textContent = 'Стилизованный элемент';
+
+            // Добавляем элемент в DOM (например, в конец body)
+            document.body.appendChild(newElement);
+        }
+
+        // Вызываем функцию для создания и стилизации элемента
+        createAndStyleElement();
+
+    </script>
+</body>
+
+</html>

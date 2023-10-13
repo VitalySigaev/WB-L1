@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Максимальный объем данных в localStorage</title>
+</head>
+
+<body>
+    <h1>Максимальный объем данных в localStorage</h1>
+    <p id="result">Рассчитываем...</p>
+
+    <script>
+        // Подсчитать максимальный объем данных, который можно записать в localStorage вашего браузера.
+        // Объем данных, который можно записать в localStorage браузера, зависит от конкретного браузера и его настроек. В большинстве современных браузерах это значение обычно составляет примерно 5-10 мегабайт. Однако оно может варьироваться в зависимости от браузера и настроек пользователя.
+
+        function calculateLocalStorageSize() {
+            try {
+                // Проверяем, поддерживается ли localStorage в текущем браузере
+                if ('localStorage' in window && window['localStorage'] !== null) {
+                    // Создаем уникальный ключ для хранения данных в localStorage
+                    const key = 'testKey';
+
+                    // Инициализируем переменную для хранения данных
+                    let data = '';
+
+                    // Начинаем цикл, который будет увеличивать размер данных до достижения максимального объема
+                    while (true) {
+                        data += 'a';
+
+                        try {
+                            // Пытаемся записать данные в localStorage
+                            localStorage.setItem(key, data);
+                        } catch (e) {
+                            // Если произошла ошибка (localStorage заполнился), завершаем цикл
+                            break;
+                        }
+                    }
+
+                    // Находим размер данных, записанных в localStorage, путем сериализации localStorage и измерения длины строки
+                    const usedSpace = (JSON.stringify(localStorage).length / (1024 * 1024)).toFixed(2); // в мегабайтах
+
+                    // Выводим результат на веб-страницу
+                    document.getElementById('result').textContent = `Максимальный объем данных в localStorage: ${usedSpace} МБ`;
+
+                    // Удаляем тестовые данные из localStorage
+                    localStorage.removeItem(key);
+                }
+            } catch (e) {
+                // Обрабатываем возможные ошибки, если что-то пошло не так
+                console.error(e);
+                document.getElementById('result').textContent = 'Не удалось определить объем данных в localStorage.';
+            }
+        }
+
+        calculateLocalStorageSize();
+        // В моем браузере получилось 5.28 МБ
+    </script>
+</body>
+
+</html>

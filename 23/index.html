@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #result {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Анализатор сложности пароля</h1>
+    <form id="passwordForm">
+        <label for="password">Введите пароль:</label>
+        <input type="password" id="password" name="password">
+        <input type="submit" value="Анализировать">
+    </form>
+    <div id="result"></div>
+
+    <script>
+        // Анализатор сложности пароля: создайте функцию, которая оценивает сложность введенного пользователем пароля. Необходимо анализировать длину пароля, использование различных символов, наличие чисел и букв в разных регистрах. Выведите пользователю оценку сложности пароля и предложите улучшения, если пароль слишком слабый.
+        
+// Эта функция анализирует силу пароля на основе набора критериев.
+function analyzePasswordStrength(password) {
+    const minLength = 8; // Минимальная длина пароля.
+
+    // Объект patterns содержит регулярные выражения для проверки различных критериев пароля.
+    const patterns = {
+        hasUpperCase: /[A-Z]/,            // Проверка наличия символов в верхнем регистре.
+        hasLowerCase: /[a-z]/,            // Проверка наличия символов в нижнем регистре.
+        hasNumber: /[0-9]/,               // Проверка наличия цифр.
+        hasSpecialChar: /[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/  // Проверка наличия специальных символов.
+    };
+
+    let strength = 0; // Начальное значение силы пароля.
+
+    // Проверяем, что длина пароля соответствует минимальной длине.
+    if (password.length >= minLength) {
+        strength++; // Увеличиваем силу на 1.
+
+        // Проверяем наличие символов в верхнем и нижнем регистре.
+        if (patterns.hasUpperCase.test(password) && patterns.hasLowerCase.test(password)) {
+            strength++; // Увеличиваем силу на 1.
+        }
+
+        // Проверяем наличие цифр.
+        if (patterns.hasNumber.test(password)) {
+            strength++; // Увеличиваем силу на 1.
+        }
+
+        // Проверяем наличие специальных символов.
+        if (patterns.hasSpecialChar.test(password)) {
+            strength++; // Увеличиваем силу на 1.
+        }
+    }
+
+    // Оцениваем силу пароля на основе значения strength и возвращаем соответствующее сообщение.
+    switch (strength) {
+        case 0:
+            return "Очень слабый пароль. Улучшите его, добавив буквы разного регистра, цифры и специальные символы.";
+        case 1:
+            return "Слабый пароль. Рекомендуется добавить буквы разного регистра, цифры и специальные символы.";
+        case 2:
+            return "Средний пароль. Рекомендуется добавить цифры и специальные символы для повышения безопасности.";
+        case 3:
+            return "Сильный пароль. Ваш пароль имеет хорошую безопасность.";
+        case 4:
+            return "Отличный пароль! Ваш пароль очень надежен.";
+    }
+}
+
+// Этот код добавляет обработчик события на отправку формы с паролем.
+document.getElementById('passwordForm').addEventListener('submit', function (e) {
+    e.preventDefault(); // Предотвращаем стандартное поведение формы.
+    const password = document.getElementById('password').value; // Получаем введенный пароль.
+    const passwordStrength = analyzePasswordStrength(password); // Оцениваем силу пароля.
+    document.getElementById('result').textContent = passwordStrength; // Выводим результат на страницу.
+});
+
+    </script>
+</body>
+
+</html>

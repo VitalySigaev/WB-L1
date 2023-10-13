@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <img id="loadedImage" src="" alt="Загруженное изображение">
+    <div id="imageInfo"></div>
+    <script>
+        // Задача на промисы: напишите функцию, которая принимает URL изображения и возвращает промис, который разрешается с данными об изображении, когда оно загружено. Когда говорится "промис разрешается с данными об изображении", это означает, что промис должен быть успешно выполнен (resolved) с данными об изображении после того, как изображение будет загружено
+
+        // Эта функция loadImageData принимает URL изображения в качестве аргумента и возвращает промис.
+        function loadImageData(url) {
+            return new Promise((resolve, reject) => {
+                // Создаем новый элемент изображения (HTML Image).
+                const image = new Image();
+
+                // Устанавливаем обработчик события, который будет вызван, когда изображение успешно загрузится.
+                image.onload = () => {
+                    // Создаем объект с данными об изображении (ширина, высота и URL).
+                    const imageData = {
+                        width: image.width,
+                        height: image.height,
+                        src: url,
+                    };
+
+                    // Разрешаем (resolve) промис с данными об изображении.
+                    resolve(imageData);
+                };
+
+                // Устанавливаем обработчик события, который будет вызван, если произойдет ошибка при загрузке изображения.
+                image.onerror = (error) => {
+                    // Отклоняем (reject) промис с ошибкой.
+                    reject(error);
+                };
+
+                // Начинаем загрузку изображения, устанавливая его URL.
+                image.src = url;
+            });
+        }
+
+        // Указываем URL изображения, которое мы хотим загрузить.
+        const imageUrl = 'https://avatars.mds.yandex.net/i?id=c6e0ba65562cfaab458667aa4440411c602cf99d-10918661-images-thumbs&n=13';
+
+        // Получаем ссылки на элементы из HTML с указанными идентификаторами.
+        const loadedImage = document.getElementById('loadedImage');
+        const imageInfo = document.getElementById('imageInfo');
+
+        // Вызываем функцию loadImageData, передавая ей URL изображения.
+        loadImageData(imageUrl)
+            .then((imageData) => {
+                // Когда промис успешно разрешится, мы обновляем атрибут 'src' изображения
+                // и текст в блоке с идентификатором imageInfo.
+                loadedImage.src = imageData.src;
+                imageInfo.textContent = `Ширина: ${imageData.width}px, Высота: ${imageData.height}px`;
+
+                // Выводим сообщение в консоль об успешной загрузке изображения.
+                console.log('Изображение успешно загружено:', imageData);
+            })
+            .catch((error) => {
+                // Выводим сообщение в консоль об ошибке при загрузке изображения.
+                console.error('Ошибка при загрузке изображения:', error);
+            });
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        #vk-widget {
+            width: 300px;
+            height: 400px;
+            overflow-y: scroll;
+            margin: 0 auto;
+        }
+
+        .post {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .post img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        #loading {
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="vk-widget">
+        <div id="post-list"></div>
+        <div id="loading" style="display: none;">Загрузка...</div>
+    </div>
+    <script>
+        //19) Реализовать виджет, отображающий список постов из любого паблика в VK (подойдет любой паблик, где постов очень много). Например, с помощью этой функции API VK. Виджет должен иметь фиксированные размеры и возможность прокрутки. При прокрутке содержимого виджета до конца должны подгружаться новые посты. Необходимо реализовать возможность кэширования уже загруженных данных: если пользователь закрыл страницу, а потом снова открыл ее, виджет должен отображать все загруженные ранее данные (новые данные должны подгружаться из учетом уже загруженных ранее).При переполнении localStorage, данные, загруженные последними должны вытеснять данные загруженные первыми.
+
+        // 20)Реализовать функцию подсчета объема памяти занимаемого данными в LocalStorage для предыдущей задачи. При изменении данных в localStorage в консоль должен выводиться объем занятой памяти / максимальный размер 	хранилища.
+
+
+        // Как делал: 1)Создал приложение в вк, с помощью вот этой ссылки: https://oauth.vk.com/authorize?client_id=51768808&display=page&redirect_uri=https://oauth.vk.com/blank.html&scope=offline&response_type=token , получил токен. В целях безопастности токен полученный с помощью моей страницы в вк убрал из кода.
+        // CORS обходил с помощью расширения для браузера
+
+
+        // Получение ссылок на элементы страницы по их id
+        const widget = document.getElementById('vk-widget');
+        const postList = document.getElementById('post-list');
+        const loadingIndicator = document.getElementById('loading');
+
+        // Инициализация переменных для управления загрузкой постов
+        let offset = 0;
+        const count = 10;
+
+        // Максимальный размер localStorage (в байтах)
+        const MAX_LOCAL_STORAGE_SIZE = 5 * 1024 * 1024; // 5 МБ
+
+        //API-ключ и ID группы ВКонтакте
+        const VK_API_KEY = '';
+        const GROUP_ID = '163452344';
+
+        // Функция для вычисления размера данных в localStorage
+        function calculateLocalStorageSize() {
+            let totalSize = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                totalSize += key.length + value.length;
+            }
+            return totalSize;
+        }
+
+        // Функция для удаления старых данных из localStorage
+        function removeOldestPostFromLocalStorage() {
+            const keys = Object.keys(localStorage);
+            if (keys.length > 0) {
+                const oldestKey = keys[0];
+                localStorage.removeItem(oldestKey);
+            }
+        }
+
+        // Функция для вывода информации о занимаемой памяти в консоль
+        function logLocalStorageUsage() {
+            const usedSpace = calculateLocalStorageSize();
+            console.log(`Занято в localStorage: ${usedSpace} байт / ${MAX_LOCAL_STORAGE_SIZE} байт`);
+        }
+
+        // Обработчик события изменения данных в localStorage
+        window.addEventListener('storage', logLocalStorageUsage);
+
+        // Функция для загрузки постов
+        function loadPosts() {
+            loadingIndicator.style.display = 'block';
+
+
+            // Запрос к API ВКонтакте для получения постов
+            fetch(`https://api.vk.com/method/wall.get?owner_id=-${GROUP_ID}&count=${count}&offset=${offset}&access_token=${VK_API_KEY}&v=5.131`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error(data.error);
+                        return;
+                    }
+
+                    const posts = data.response.items;
+
+                    if (posts.length === 0) {
+                        loadingIndicator.style.display = 'none';
+                        return;
+                    }
+
+
+                    posts.forEach(function (post) {
+                        const postElement = document.createElement('div');
+                        postElement.className = 'post';
+
+                        // Отображение текста поста
+                        postElement.innerHTML = post.text;
+
+                        // Отображение фотографий
+                        if (post.attachments) {
+                            post.attachments.forEach(function (attachment) {
+                                if (attachment.type === 'photo') {
+                                    const photo = attachment.photo;
+                                    const photoUrl = photo.sizes[photo.sizes.length - 1].url;
+                                    const imgElement = document.createElement('img');
+                                    imgElement.src = photoUrl;
+                                    postElement.appendChild(imgElement);
+                                }
+                            });
+                        }
+
+                        // Отображение количества лайков и комментариев
+                        if (post.likes) {
+                            const likesCount = post.likes.count;
+                            const commentsCount = post.comments.count;
+                            postElement.innerHTML += `<p>Лайков: ${likesCount}</p><p>Комментариев: ${commentsCount}</p>`;
+                        }
+
+                        postList.appendChild(postElement);
+
+                        // Сохранение данных в localStorage
+                        const postData = {
+                            text: post.text,
+                            attachments: post.attachments,
+                            likes: post.likes
+                        };
+                        const postDataString = JSON.stringify(postData);
+                        const postKey = `post_${Date.now()}`;
+                        const postSize = postKey.length + postDataString.length;
+
+                        // Удаление старых данных, если localStorage переполнен
+                        while (calculateLocalStorageSize() + postSize > MAX_LOCAL_STORAGE_SIZE) {
+                            removeOldestPostFromLocalStorage();
+                        }
+                        localStorage.setItem(postKey, postDataString);
+
+                        // Вызов функции для вывода информации о занимаемой памяти в консоль
+                        logLocalStorageUsage();
+                    });
+                    offset += count;
+                    loadingIndicator.style.display = 'none';
+                });
+        }
+
+        // Обработка события прокрутки для загрузки новых постов
+        widget.addEventListener('scroll', function () {
+            if (widget.scrollTop + widget.clientHeight >= postList.clientHeight - 100) {
+                loadPosts();
+            }
+        });
+
+        // Загрузка первой порции постов при запуске виджета
+        loadPosts();
+    </script>
+
+</body>
+
+</html>
